@@ -6,8 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "STUHealthComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnDeath)
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float)
+DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SHOOTTHEMUP_API USTUHealthComponent : public UActorComponent
@@ -15,17 +15,16 @@ class SHOOTTHEMUP_API USTUHealthComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
 	USTUHealthComponent();
-
+	
+	FOnDeathSignature OnDeath;
+	FOnHealthChangedSignature OnHealthChanged;
+	
+	UFUNCTION(BlueprintCallable, Category="Health")
+    bool IsDead() const { return FMath::IsNearlyZero(Health); }
+	
 	float GetHealth() const { return Health; }
-
-	UFUNCTION(BlueprintCallable)
-	bool IsDead() const { return FMath::IsNearlyZero(Health); }
-
-	FOnDeath OnDeath;
-	FOnHealthChanged OnHealthChanged;
-
+	
 protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Health", meta = (ClampMin = "0.0", ClampMax = "100.0"))
@@ -34,13 +33,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Heal")
 	bool bAutoHeal = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Heal", meta = (ClampMin = "0.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Heal", meta = (EditCondition = "bAutoHeal", ClampMin = "0.0"))
 	float HealUpdateTime = 0.3f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Heal", meta = (ClampMin = "0.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Heal", meta = (EditCondition = "bAutoHeal", ClampMin = "0.0"))
 	float HealDelay = 3.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Heal", meta = (ClampMin = "0.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Heal", meta = (EditCondition = "bAutoHeal", ClampMin = "0.0"))
 	float HealModifier = 1.0f;
 
 	virtual void BeginPlay() override;

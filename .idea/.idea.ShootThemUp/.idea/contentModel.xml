@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ContentModelStore">
     <e p="C:\Users\vakuo\AppData\Local\JetBrains\Rider2020.3\extResources" t="IncludeRecursive" />
-    <e p="C:\Users\vakuo\AppData\Local\JetBrains\Rider2020.3\resharper-host\Local\Transient\Rider\v203\SolutionCaches\_ShootThemUp.1935152989.00" t="ExcludeRecursive" />
+    <e p="C:\Users\vakuo\AppData\Local\JetBrains\Rider2020.3\resharper-host\Local\Transient\Rider\v203\SolutionCaches\_ShootThemUp.-963960446.00" t="ExcludeRecursive" />
     <e p="H:\Program Files\Epic Games\UE_4.26\Engine\Config" t="Include">
       <e p="Android" t="Include">
         <e p="AndroidEngine.ini" t="Include" />
@@ -49054,11 +49054,14 @@
       <e p="UE4Editor.Target.cs" t="Include" />
       <e p="UE4Game.Target.cs" t="Include" />
     </e>
-    <e p="H:\Projects\Unreal\ShootThemUp" t="IncludeFlat">
+    <e p="H:\Projects\Unreal\ShootThemUpClone" t="IncludeFlat">
+      <e p=".gitattributes" t="Include" />
+      <e p=".gitignore" t="Include" />
       <e p="Config" t="Include">
         <e p="DefaultEditor.ini" t="Include" />
         <e p="DefaultEngine.ini" t="Include" />
         <e p="DefaultGame.ini" t="Include" />
+        <e p="DefaultInput.ini" t="Include" />
       </e>
       <e p="Engine" t="Include" />
       <e p="Games" t="Include" />
@@ -49073,18 +49076,48 @@
       <e p="Source" t="Include">
         <e p="ShootThemUp" t="Include">
           <e p="Private" t="Include">
+            <e p="Components" t="Include">
+              <e p="STUCharacterMovementComponent.cpp" t="Include" />
+            </e>
+            <e p="Dev" t="Include">
+              <e p="STUDevDamageActor.cpp" t="Include" />
+              <e p="STUFireDamageType.cpp" t="Include" />
+              <e p="STUIceDamageType.cpp" t="Include" />
+            </e>
             <e p="Player" t="Include">
               <e p="STUPlayerController.cpp" t="Include" />
             </e>
             <e p="STUBaseCharacter.cpp" t="Include" />
             <e p="STUGameModeBase.cpp" t="Include" />
+            <e p="STUHealthComponent.cpp" t="Include" />
+            <e p="UI" t="Include">
+              <e p="STUGameHUD.cpp" t="Include" />
+            </e>
+            <e p="Weapon" t="Include">
+              <e p="STUBaseWeapon.cpp" t="Include" />
+            </e>
           </e>
           <e p="Public" t="Include">
+            <e p="Components" t="Include">
+              <e p="STUCharacterMovementComponent.h" t="Include" />
+            </e>
+            <e p="Dev" t="Include">
+              <e p="STUDevDamageActor.h" t="Include" />
+              <e p="STUFireDamageType.h" t="Include" />
+              <e p="STUIceDamageType.h" t="Include" />
+            </e>
             <e p="Player" t="Include">
               <e p="STUPlayerController.h" t="Include" />
             </e>
             <e p="STUBaseCharacter.h" t="Include" />
             <e p="STUGameModeBase.h" t="Include" />
+            <e p="STUHealthComponent.h" t="Include" />
+            <e p="UI" t="Include">
+              <e p="STUGameHUD.h" t="Include" />
+            </e>
+            <e p="Weapon" t="Include">
+              <e p="STUBaseWeapon.h" t="Include" />
+            </e>
           </e>
           <e p="ShootThemUp.Build.cs" t="Include" />
           <e p="ShootThemUp.cpp" t="Include" />
