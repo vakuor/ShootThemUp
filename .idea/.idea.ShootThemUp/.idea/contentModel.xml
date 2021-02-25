@@ -49078,6 +49078,7 @@
           <e p="Private" t="Include">
             <e p="Components" t="Include">
               <e p="STUCharacterMovementComponent.cpp" t="Include" />
+              <e p="STUWeaponComponent.cpp" t="Include" />
             </e>
             <e p="Dev" t="Include">
               <e p="STUDevDamageActor.cpp" t="Include" />
@@ -49095,11 +49096,15 @@
             </e>
             <e p="Weapon" t="Include">
               <e p="STUBaseWeapon.cpp" t="Include" />
+              <e p="STULauncherWeapon.cpp" t="Include" />
+              <e p="STUProjectile.cpp" t="Include" />
+              <e p="STURifleWeapon.cpp" t="Include" />
             </e>
           </e>
           <e p="Public" t="Include">
             <e p="Components" t="Include">
               <e p="STUCharacterMovementComponent.h" t="Include" />
+              <e p="STUWeaponComponent.h" t="Include" />
             </e>
             <e p="Dev" t="Include">
               <e p="STUDevDamageActor.h" t="Include" />
@@ -49117,6 +49122,9 @@
             </e>
             <e p="Weapon" t="Include">
               <e p="STUBaseWeapon.h" t="Include" />
+              <e p="STULauncherWeapon.h" t="Include" />
+              <e p="STUProjectile.h" t="Include" />
+              <e p="STURifleWeapon.h" t="Include" />
             </e>
           </e>
           <e p="ShootThemUp.Build.cs" t="Include" />
