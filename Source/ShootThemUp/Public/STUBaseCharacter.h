@@ -17,7 +17,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class USTUHealthComponent;
 class UTextRenderComponent;
-class ASTUBaseWeapon;
+class USTUWeaponComponent;
 UCLASS()
 class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 {
@@ -30,36 +30,36 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	int32 SprintSpeed = 1200;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	USpringArmComponent* SpringArmComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	UCameraComponent* CameraComponent;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	USTUHealthComponent* HealthComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	UTextRenderComponent* HealthTextComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Weapon")
+	USTUWeaponComponent* WeaponComponent;
+
 	UPROPERTY(EditDefaultsOnly, Category="Animation")
 	UAnimMontage* DeathAnimMontage;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Damage")
 	float LifeSpanOnDeath = 5.0f;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Damage")
 	FVector2D LandedDamageVelocity = FVector2D(900.0f, 1200.0f);
 
 	UPROPERTY(EditDefaultsOnly, Category="Damage")
 	FVector2D LandedDamage = FVector2D(10.0f, 100.0f);
 
-	UPROPERTY(EditDefaultsOnly, Category="Damage")
-	TSubclassOf<ASTUBaseWeapon> WeaponClass;
-	
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -71,7 +71,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Movement")
 	float GetMovementDirection() const;
-	
+
 private:
 	bool WantsToRun = false;
 	bool IsMovingForward = false;
@@ -82,7 +82,5 @@ private:
 	void OnDeath();
 	void OnHealthChanged(float);
 	UFUNCTION()
-    void OnGroundLanded(const FHitResult& Hit);
-
-	void SpawnWeapon();
+	void OnGroundLanded(const FHitResult& Hit);
 };
