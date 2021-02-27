@@ -4,22 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "STUCoreTypes.h"
 #include "STUBaseWeapon.generated.h"
 
-USTRUCT(BlueprintType)
-struct FAmmoData
-{
-	GENERATED_USTRUCT_BODY()
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon")
-	int32 Bullets;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon", meta = (EditCondition = "!Infinite"))
-	int32 Clips;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon")
-	bool Infinite;
-};
 
 UCLASS()
 class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
@@ -27,11 +14,19 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 	GENERATED_BODY()
 
 public:
-
 	ASTUBaseWeapon();
+	
+	FOnClipEmptySignature OnClipEmpty;
+	
 	virtual void StartFire();
 	virtual void StopFire();
+	
+	void ChangeClip();
+	bool CanReload() const;
 
+	FWeaponUIData GetUIData() const { return UIData; }
+	FAmmoData GetAmmoData() const { return CurrentAmmo; }
+	
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
@@ -45,6 +40,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon")
 	FAmmoData DefaultAmmo{15, 10, false};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="UI")
+	FWeaponUIData UIData;
 	
 	virtual void BeginPlay() override;
 	
@@ -60,7 +58,6 @@ protected:
 	void DecreaseAmmo();
 	bool IsAmmoEmpty() const;
 	bool IsClipEmpty() const;
-	void ChangeClip();
 	void LogAmmo();
 private:
 	FAmmoData CurrentAmmo;
