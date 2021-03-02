@@ -5,6 +5,7 @@
 
 
 
+#include "Animation/Rig.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/STUCharacterMovementComponent.h"
 #include "Components/STUWeaponComponent.h"
@@ -28,6 +29,17 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer& ObjInit): Super(
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
+	/*
+	*SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
+	SpringArmComponent->SetupAttachment(GetRootComponent());
+	SpringArmComponent->bUsePawnControlRotation = true;
+	SpringArmComponent->SocketOffset = FVector(0.0f, 100.0f, 80.0f);
+
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
+	CameraComponent->SetupAttachment(GetRootComponent());
+	STUUtils::AttachActorToSocket<UCameraComponent, USkeletalMesh>(CameraComponent,GetMesh(),"HeadSocket");
+	
+	 */
 	HealthComponent = CreateDefaultSubobject<USTUHealthComponent>("HealthComponent");
 
 	HealthTextComponent = CreateDefaultSubobject<UTextRenderComponent>("HealthTextComponent");
@@ -45,8 +57,9 @@ void ASTUBaseCharacter::BeginPlay()
 	check(HealthComponent);
 	check(HealthTextComponent);
 	check(GetCharacterMovement());
+	check(GetMesh());
 
-	OnHealthChanged(HealthComponent->GetHealth());
+	OnHealthChanged(HealthComponent->GetHealth(), 0.0f);
 	HealthComponent->OnDeath.AddUObject(this, &ASTUBaseCharacter::OnDeath);
 	HealthComponent->OnHealthChanged.AddUObject(this, &ASTUBaseCharacter::OnHealthChanged);
 
@@ -68,7 +81,7 @@ void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASTUBaseCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASTUBaseCharacter::MoveRight);
-	PlayerInputComponent->BindAxis("MouseUp", this, &ASTUBaseCharacter::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("MouseUp", this, &ASTUBaseCharacter::LookUp);
 	PlayerInputComponent->BindAxis("MouseRight", this, &ASTUBaseCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASTUBaseCharacter::Jump);
 	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &ASTUBaseCharacter::OnStartSprint);
@@ -77,6 +90,7 @@ void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Fire", IE_Released, WeaponComponent, &USTUWeaponComponent::StopFire);
 	PlayerInputComponent->BindAction("SwitchWeapon", IE_Released, WeaponComponent, &USTUWeaponComponent::NextWeapon);
 	PlayerInputComponent->BindAction("Reload", IE_Released, WeaponComponent, &USTUWeaponComponent::Reload);
+	PlayerInputComponent->BindAction("SwitchCamera", IE_Pressed, this, &ASTUBaseCharacter::SwitchCamera);
 }
 
 bool ASTUBaseCharacter::IsRunning() const
@@ -110,7 +124,7 @@ void ASTUBaseCharacter::OnDeath()
 {
 	UE_LOG(LogBaseCharacter, Display, TEXT("Player %s is dead"), *GetName());
 
-	PlayAnimMontage(DeathAnimMontage);
+	//PlayAnimMontage(DeathAnimMontage);
 
 	GetCharacterMovement()->DisableMovement();
 
@@ -122,9 +136,12 @@ void ASTUBaseCharacter::OnDeath()
 	}
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	WeaponComponent->StopFire();
+	
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetMesh()->SetSimulatePhysics(true);
 }
 
-void ASTUBaseCharacter::OnHealthChanged(float Health)
+void ASTUBaseCharacter::OnHealthChanged(float Health, float HealthDelta) const
 {
 	HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
 }
@@ -140,6 +157,35 @@ void ASTUBaseCharacter::OnGroundLanded(const FHitResult& Hit)
 
 	UE_LOG(LogBaseCharacter, Display, TEXT("Final damage: %f"), FinalDamage);
 	TakeDamage(FinalDamage, FDamageEvent{}, nullptr, nullptr);
+}
+
+void ASTUBaseCharacter::LookUp(float Amount)
+{
+	//UE_LOG(LogBaseCharacter, Display, TEXT("Pitch amount: %.2f"), Amount);
+	AddControllerPitchInput(Amount);
+}
+
+void ASTUBaseCharacter::SwitchCamera()
+{
+	if(CameraComponent && SpringArmComponent && HealthComponent && !HealthComponent->IsDead())
+	{
+		
+		if(IsFirstPerson)
+		{
+			const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,false);
+			CameraComponent->AttachToComponent(SpringArmComponent, AttachmentRules);
+			CameraComponent->bUsePawnControlRotation = false;
+		}
+		else
+		{
+			const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld,EAttachmentRule::KeepWorld, false);
+			CameraComponent->AttachToComponent(GetMesh(), AttachmentRules, "HeadSocket");
+			//GetMesh()->SkeletalMesh->Skeleton->GetRig().Nodes[0]
+			CameraComponent->bUsePawnControlRotation = true;
+			//CameraComponent->SetupAttachment(GetMesh());
+		}
+		IsFirstPerson = !IsFirstPerson;
+	}
 }
 
 void ASTUBaseCharacter::MoveForward(float Amount)

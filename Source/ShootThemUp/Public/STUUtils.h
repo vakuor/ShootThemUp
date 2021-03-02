@@ -1,3 +1,5 @@
+// Shoot Them Up Game. All rights reserved!
+
 #pragma once
 
 class STUUtils
@@ -9,6 +11,15 @@ public:
 		if (!PlayerPawn) return nullptr;
 
 		return Cast<T>(PlayerPawn->GetComponentByClass(T::StaticClass()));
+	}
+
+	static bool AttachActorToSocket(AActor* Actor, USceneComponent* SceneComponentTo,
+                                               const FName& SocketName)
+	{
+		if (!Actor || !SceneComponentTo) return false;
+		const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
+		Actor->AttachToComponent(SceneComponentTo, AttachmentRules, SocketName);
+		return true;
 	}
 };
 

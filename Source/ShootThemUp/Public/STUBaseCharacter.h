@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 
-#include "STUHealthComponent.h"
+#include "Components/STUHealthComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -75,12 +75,16 @@ public:
 private:
 	bool WantsToRun = false;
 	bool IsMovingForward = false;
+	bool IsFirstPerson = false;
 	void MoveForward(float Amount);
 	void MoveRight(float Amount);
 	void OnStartSprint();
 	void OnEndSprint();
 	void OnDeath();
-	void OnHealthChanged(float);
+	void OnHealthChanged(float Health, float HealthDelta) const;
 	UFUNCTION()
 	void OnGroundLanded(const FHitResult& Hit);
+	
+	void LookUp(float Amount);
+	void SwitchCamera();
 };

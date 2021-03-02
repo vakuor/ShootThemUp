@@ -4,7 +4,7 @@
 
 class ASTUBaseWeapon;
 //weapon
-DECLARE_MULTICAST_DELEGATE(FOnClipEmptySignature);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnClipEmptySignature, ASTUBaseWeapon*);
 
 USTRUCT(BlueprintType)
 struct FAmmoData
@@ -47,4 +47,39 @@ struct FWeaponUIData
 
 //health
 DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHealthChangedSignature, float, float);
+
+// VFX
+
+class UNiagaraSystem;
+
+USTRUCT(BlueprintType)
+struct FDecalData
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+	UMaterialInterface* Material;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+	FVector Size = FVector(10.0f);
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+	float LifeTime = 5.0f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+	float FadeOutTime = 0.7f;
+};
+
+USTRUCT(BlueprintType)
+struct FImpactData
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+	// ReSharper disable once UnrealHeaderToolParserError
+	UNiagaraSystem* NiagaraEffect;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+	FDecalData DecalData;
+};

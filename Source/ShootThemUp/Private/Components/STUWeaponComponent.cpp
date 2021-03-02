@@ -3,6 +3,8 @@
 #include "Components/STUWeaponComponent.h"
 
 
+
+#include "STUUtils.h"
 #include "Animations/STUEquipFinishedAnimNotify.h"
 #include "Animations/STUReloadFinishedAnimNotify.h"
 #include "Animations/AnimUtils.h"
@@ -58,17 +60,18 @@ void USTUWeaponComponent::SpawnWeapons()
 		Weapon->SetOwner(Character);
 		Weapons.Add(Weapon);
 
-		AttachWeaponToSocket(Weapon, Character->GetMesh(), WeaponArmorySocketName);
+		STUUtils::AttachActorToSocket(Weapon, Character->GetMesh(), WeaponArmorySocketName);
+		//AttachWeaponToSocket(Weapon, Character->GetMesh(), WeaponArmorySocketName);
 	}
 }
 
-void USTUWeaponComponent::AttachWeaponToSocket(ASTUBaseWeapon* Weapon, USceneComponent* SceneComponent,
+/*void USTUWeaponComponent::AttachWeaponToSocket(ASTUBaseWeapon* Weapon, USceneComponent* SceneComponent,
                                                const FName& SocketName)
 {
 	if (!Weapon || !SceneComponent) return;
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
 	Weapon->AttachToComponent(SceneComponent, AttachmentRules, SocketName);
-}
+}*/
 
 void USTUWeaponComponent::EquipWeapon(int32 WeaponIndex)
 {
@@ -83,7 +86,9 @@ void USTUWeaponComponent::EquipWeapon(int32 WeaponIndex)
 	if (CurrentWeapon)
 	{
 		CurrentWeapon->StopFire();
-		AttachWeaponToSocket(CurrentWeapon, Character->GetMesh(), WeaponArmorySocketName);
+		STUUtils::AttachActorToSocket(CurrentWeapon, Character->GetMesh(), WeaponArmorySocketName);
+		
+		//AttachWeaponToSocket(CurrentWeapon, Character->GetMesh(), WeaponArmorySocketName);
 	}
 
 	CurrentWeapon = Weapons[WeaponIndex];
@@ -94,7 +99,9 @@ void USTUWeaponComponent::EquipWeapon(int32 WeaponIndex)
 	});
 	CurrentReloadAnimMontage = CurrentWeaponData ? CurrentWeaponData->ReloadAnimMontage : nullptr;
 
-	AttachWeaponToSocket(CurrentWeapon, Character->GetMesh(), WeaponEquipSocketName);
+	STUUtils::AttachActorToSocket(CurrentWeapon, Character->GetMesh(), WeaponEquipSocketName);
+	
+	//AttachWeaponToSocket(CurrentWeapon, Character->GetMesh(), WeaponEquipSocketName);
 	bEquipAnimInProgress = true;
 	PlayAnimMontage(EquipAnimMontage);
 }
@@ -187,9 +194,24 @@ bool USTUWeaponComponent::CanReload() const
 	return CurrentWeapon && !bEquipAnimInProgress && !bReloadAnimInProgress && CurrentWeapon->CanReload();
 }
 
-void USTUWeaponComponent::OnEmptyClip()
+void USTUWeaponComponent::OnEmptyClip(ASTUBaseWeapon* Weapon)
 {
-	ChangeClip();
+	if(!Weapon) return;
+	
+	if(CurrentWeapon == Weapon)
+	{
+		ChangeClip();
+	}
+	else
+	{
+		for (const auto WeaponI : Weapons)
+		{
+			if(Weapon == WeaponI)
+			{
+				WeaponI->ChangeClip();
+			}
+		}
+	}
 }
 
 void USTUWeaponComponent::ChangeClip()
@@ -222,6 +244,18 @@ bool USTUWeaponComponent::GetCurrentWeaponAmmoData(FAmmoData& AmmoData) const
 	{
 		AmmoData = CurrentWeapon->GetAmmoData();
 		return true;
+	}
+	return false;
+}
+
+bool USTUWeaponComponent::TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, int32 ClipsAmount)
+{
+	for(const auto Weapon: Weapons)
+	{
+		if(Weapon && Weapon->IsA(WeaponType))
+		{
+			return Weapon->TryToAddAmmo(ClipsAmount);
+		}
 	}
 	return false;
 }
