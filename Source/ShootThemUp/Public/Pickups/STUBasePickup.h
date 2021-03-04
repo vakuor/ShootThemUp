@@ -19,17 +19,21 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category="Pickup")
 	USphereComponent* CollisionComponent;
 
-	UPROPERTY(VisibleAnywhere, Category="Pickup")
-	float RespawnTime = 5.0f;;
+	UPROPERTY(EditAnywhere, Category="Pickup")
+	float RespawnTime = 5.0f;
+	
+	//UPROPERTY(EditAnywhere, Category="Pickup")
+	//bool CouldBeTakenTest = true;
 
 	virtual void BeginPlay() override;
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
 public:
 	virtual void Tick(float DeltaTime) override;
-
+	bool CouldBeTaken() const;
 private:
 	float RotationYaw = 0.0f;
+	FTimerHandle RespawnTimerHandle;
 	
 	virtual bool GivePickupTo(APawn* PlayerPawn);
 	

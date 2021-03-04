@@ -24,7 +24,7 @@ void ASTURifleWeapon::BeginPlay()
 
 void ASTURifleWeapon::StartFire()
 {
-	UE_LOG(LogRifleWeapon, Display, TEXT("Fire!"));
+	//UE_LOG(LogRifleWeapon, Display, TEXT("Fire!"));
 	InitMuzzleFX();
 	GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &ASTURifleWeapon::MakeShot, TimeBetweenShots, true);
 	MakeShot();
@@ -32,7 +32,7 @@ void ASTURifleWeapon::StartFire()
 
 void ASTURifleWeapon::StopFire()
 {
-	UE_LOG(LogRifleWeapon, Display, TEXT("Fire stop!"));
+	//UE_LOG(LogRifleWeapon, Display, TEXT("Fire stop!"));
 
 	GetWorldTimerManager().ClearTimer(ShotTimerHandle);
 	SetMuzzleFXVisibility(false);
@@ -65,7 +65,7 @@ void ASTURifleWeapon::MakeShot()
 		//if( HitResult.Actor.IsValid() && HitResult.Actor->IsA())
 		MakeDamage(HitResult);
 		WeaponFXComponent->PlayImpactFX(HitResult);
-		UE_LOG(LogRifleWeapon, Display, TEXT("Bone: %s"), *HitResult.BoneName.ToString());
+		//UE_LOG(LogRifleWeapon, Display, TEXT("Bone: %s"), *HitResult.BoneName.ToString());
 	} /*else
 	{
 		DrawDebugLine(GetWorld(), GetMuzzleWorldLocation(), TraceEnd, FColor::Red, false, 3.0f, 0, 3.0f);
@@ -93,7 +93,7 @@ void ASTURifleWeapon::MakeDamage(const FHitResult& HitResult)
 	const auto Target = HitResult.GetActor();
 	if(!Target) return;
 	
-	Target->TakeDamage(WeaponDamage, FDamageEvent(), GetPlayerController(), this);
+	Target->TakeDamage(WeaponDamage, FDamageEvent(), GetController(), this);
 		
 }
 
@@ -123,4 +123,10 @@ void ASTURifleWeapon::SpawnTraceFX(const FVector& TraceStart, const FVector& Tra
 	{
 		TraceFXComponent->SetNiagaraVariableVec3(TraceTargetName, TraceEnd);
 	}
+}
+
+AController* ASTURifleWeapon::GetController() const
+{
+	const auto Pawn = Cast<APawn>(GetOwner());
+	return Pawn ? Pawn->GetController() : nullptr;
 }
