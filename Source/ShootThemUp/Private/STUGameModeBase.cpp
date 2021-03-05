@@ -3,12 +3,17 @@
 
 #include "STUGameModeBase.h"
 #include "AIController.h"
+#include "EngineUtils.h"
 #include "STUBaseCharacter.h"
+#include "STUUtils.h"
+#include "Components/STURespawnComponent.h"
 #include "Player/STUPlayerController.h"
 #include "Player/STUPlayerState.h"
 #include "UI/STUGameHUD.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogSTUGameModeBase, All, All);
+
+constexpr static int32 MinRoundTimeForRespawn = 5;
 
 ASTUGameModeBase::ASTUGameModeBase(){
 	DefaultPawnClass = ASTUBaseCharacter::StaticClass();
@@ -26,6 +31,8 @@ void ASTUGameModeBase::StartPlay()
 
 	CurrentRound = 1;
 	StartRound();
+
+	SetMatchState(ESTUMatchState::InProgress);
 }
 
 void ASTUGameModeBase::SpawnBots()
@@ -67,8 +74,7 @@ void ASTUGameModeBase::GameTimerUpdate()
 		}
 		else
 		{
-			UE_LOG(LogSTUGameModeBase, Display, TEXT("======= GAME OVER ======="));
-			LogPlayerInfo();
+			GameOver();
 		}
 	}
 }
@@ -114,6 +120,66 @@ void ASTUGameModeBase::Killed(AController* KillerController, AController* Victim
 	{
 		VictimPlayerState->AddDeath();
 	}
+
+	StartRespawn(VictimController);
+}
+
+void ASTUGameModeBase::StartRespawn(AController* Controller)
+{
+	const auto RespawnAvailable = RoundCountDown > MinRoundTimeForRespawn + GameData.RespawnTime;
+	if(!RespawnAvailable) return;
+	const auto RespawnComponet = STUUtils::GetSTUPlayerComponent<USTURespawnComponent>(Controller);
+	if(!RespawnComponet) return;
+
+	RespawnComponet->Respawn(GameData.RespawnTime);
+}
+
+void ASTUGameModeBase::GameOver()
+{
+	UE_LOG(LogSTUGameModeBase, Display, TEXT("======= GAME OVER ======="));
+	LogPlayerInfo();
+
+	for (auto Pawn : TActorRange<APawn>(GetWorld()))
+	{
+		Pawn->TurnOff();
+		Pawn->DisableInput(nullptr);
+	}
+
+	SetMatchState(ESTUMatchState::GameOver);
+}
+
+void ASTUGameModeBase::SetMatchState(ESTUMatchState State)
+{
+	if(MatchState == State) return;
+
+	MatchState = State;
+	OnMatchStateChanged.Broadcast(MatchState);
+}
+
+void ASTUGameModeBase::RespawnRequest(AController* Controller)
+{
+	ResetOnePlayer(Controller);
+}
+
+bool ASTUGameModeBase::SetPause(APlayerController* PC, FCanUnpause CanUnpauseDelegate)
+{
+	const auto PauseSet = Super::SetPause(PC, CanUnpauseDelegate);
+	if(PauseSet)
+	{
+		SetMatchState(ESTUMatchState::Pause);
+	}
+
+	return PauseSet;
+}
+
+bool ASTUGameModeBase::ClearPause()
+{
+	const auto PauseCleared = Super::ClearPause();
+	if(PauseCleared)
+	{
+		SetMatchState(ESTUMatchState::InProgress);
+	}
+	return PauseCleared;
 }
 
 void ASTUGameModeBase::LogPlayerInfo()
@@ -145,6 +211,7 @@ void ASTUGameModeBase::CreateTeamsInfo()
 
 		PlayerState->SetTeamID(TeamID);
 		PlayerState->SetTeamColor(DetermineColorByTeamID(TeamID));
+		PlayerState->SetPlayerName(Controller->IsPlayerController() ? "Player" : "Bot");
 		SetPlayerColor(Controller);
 		
 		TeamID = TeamID == 1 ? 2 : 1;
