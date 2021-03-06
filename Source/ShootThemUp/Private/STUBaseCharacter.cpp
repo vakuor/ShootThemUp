@@ -102,9 +102,8 @@ void ASTUBaseCharacter::OnDeath()
 	GetMesh()->SetSimulatePhysics(true);
 }
 
-void ASTUBaseCharacter::OnHealthChanged(float Health, float HealthDelta) const
+void ASTUBaseCharacter::OnHealthChanged(float Health, float HealthDelta)
 {
-	
 }
 
 void ASTUBaseCharacter::OnGroundLanded(const FHitResult& Hit)
