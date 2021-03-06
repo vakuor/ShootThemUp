@@ -3,6 +3,8 @@
 
 #include "Player/STUPlayerController.h"
 
+
+#include "STUGameInstance.h"
 #include "STUGameModeBase.h"
 #include "Components/STURespawnComponent.h"
 #include "GameFramework/GameModeBase.h"
@@ -60,4 +62,14 @@ void ASTUPlayerController::OnMatchStateChanged(ESTUMatchState State)
 		SetInputMode(FInputModeUIOnly());
 		bShowMouseCursor = true;
 	}
+}
+
+void ASTUPlayerController::OnMuteSound()
+{
+	if(!GetWorld()) return;
+
+	const auto STUGameInstance = GetWorld()->GetGameInstance<USTUGameInstance>();
+	if(!STUGameInstance) return;
+
+	STUGameInstance->ToggleVolume();
 }

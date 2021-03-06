@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "STUBasePickup.generated.h"
 
+class USoundCue;
 class USphereComponent;
 UCLASS()
 class SHOOTTHEMUP_API ASTUBasePickup : public AActor
@@ -19,8 +20,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category="Pickup")
 	USphereComponent* CollisionComponent;
 
-	UPROPERTY(EditAnywhere, Category="Pickup")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Pickup")
 	float RespawnTime = 5.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
+	USoundCue* PickupTakenSound;
 	
 	//UPROPERTY(EditAnywhere, Category="Pickup")
 	//bool CouldBeTakenTest = true;
