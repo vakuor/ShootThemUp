@@ -57,9 +57,9 @@ void USTULevelItemWidget::SetLevelData(const FLevelData& Data)
 
 void USTULevelItemWidget::SetSelected(bool IsSelected)
 {
-	if(FrameImage)
+	if(LevelImage)
 	{
-		FrameImage->SetColorAndOpacity(IsSelected ? FLinearColor::Red : FLinearColor::White);
+		LevelImage->SetColorAndOpacity(IsSelected ? FLinearColor::Red : FLinearColor::White);
 	}
 }
 
